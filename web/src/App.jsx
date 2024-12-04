@@ -81,36 +81,35 @@ function App() {
 
   }
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    // setIsLoading(true);
+ const handleFormSubmit = async (e) => {
+  e.preventDefault();
 
-    const agent = await getAgent();
-    const max = 5;
-    let cursor = null;
-    let i = 0;
-    let followed = [];
+  const agent = await getAgent();
+  const max = 5;
+  let cursor = null;
+  let i = 0;
+  let followers = [];
 
-    do
-    {
-      i++;
-      const { data } = await agent.getFollows({ actor: startFollowingAccount, limit: 100, cursor });
-      console.log(data, `${i}/${max}`);
-      if( followed.length < 1 && data.subject ) followed.push(data.subject);
+  do {
+    i++;
+    const { data } = await agent.getFollowers({ actor: startFollowingAccount, limit: 100, cursor });
+    console.log(data, `${i}/${max}`);
+    if (followers.length < 1 && data.subject) followers.push(data.subject);
 
-      if( data.follows ) {
-        
-        followed = [...followed, ...data.follows];
-        if( data.cursor ) {
-          cursor = data.cursor;
-        } 
+    if (data.followers) {
+      followers = [...followers, ...data.followers];
+      if (data.cursor) {
+        cursor = data.cursor;
       }
-      console.log( followed, cursor )
-    }while(cursor && i < max);
-    followed = followed.filter((actor, index, self) => self.findIndex((t) => t.did === actor.did) === index);
-    
-    setFollowings(followed);
-  };
+    }
+    console.log(followers, cursor);
+  } while (cursor && i < max);
+
+  followers = followers.filter((actor, index, self) => self.findIndex((t) => t.did === actor.did) === index);
+
+  setFollowings(followers); // Update state to reflect fetched followers
+};
+
 
   function toggleToFollow(status, did)
   {
